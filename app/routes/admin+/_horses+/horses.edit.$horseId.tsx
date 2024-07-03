@@ -70,8 +70,14 @@ export async function action({ request, params }: DataFunctionArgs) {
 		)
 	}
 
-	const { name, notes, status, cooldown, cooldownStartDate, cooldownEndDate } =
-		submission.value
+	const {
+		name,
+		notes = '',
+		status = '',
+		cooldown,
+		cooldownStartDate,
+		cooldownEndDate,
+	} = submission.value
 
 	const updatedHorse = await prisma.horse.update({
 		where: { id: params.horseId },
@@ -278,31 +284,29 @@ export default function EditHorse() {
 							/>
 						</fieldset>
 					) : null}
-					{conflictEvents ? (
+					{conflictEvents && conflictEvents.length > 0 ? (
 						<Alert variant="destructive">
 							<AlertTriangle className="h-4 w-4" />
 							<AlertTitle>
 								Horse removed from {conflictEvents.length}{' '}
-								{conflictEvents.length > 1 ? 'events' : 'event'}
+								{conflictEvents.length === 1 ? 'event' : 'events'}
 							</AlertTitle>
 							<AlertDescription>
 								<ul className="mt-2 flex flex-col gap-2">
-									{conflictEvents
-										? conflictEvents.map(e => {
-												const date = format(new Date(e.start), 'MMMM do, yyyy')
-												const link = `/calendar/${e.id}`
-												return (
-													<>
-														<li key={e.id}>
-															<Link to={link} target="_blank">
-																<span>{e.title} - </span>
-																<span>{date}</span>
-															</Link>
-														</li>
-													</>
-												)
-										  })
-										: null}
+									{conflictEvents.map(e => {
+										const date = format(new Date(e.start), 'MMMM do, yyyy')
+										const link = `/calendar/${e.id}`
+										return (
+											<>
+												<li key={e.id}>
+													<Link to={link} target="_blank">
+														<span>{e.title} - </span>
+														<span>{date}</span>
+													</Link>
+												</li>
+											</>
+										)
+									})}
 								</ul>
 							</AlertDescription>
 						</Alert>
